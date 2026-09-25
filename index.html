@@ -202,7 +202,10 @@
         position: absolute;
         z-index: 1;
         inset: 0;
-        background: var(--sleeve-overlay, #ffd72b);
+        background:
+            repeating-linear-gradient(45deg, var(--sleeve-line-color, rgba(255, 255, 255, .05)) 0 1px, transparent 1px 6px),
+            repeating-linear-gradient(-45deg, var(--sleeve-line-color, rgba(255, 255, 255, .05)) 0 1px, transparent 1px 6px),
+            var(--sleeve-overlay, #ffd72b);
         opacity: 1;
         -webkit-mask: url("back_sleeve.png") center / 100% 100% no-repeat;
         mask: url("back_sleeve.png") center / 100% 100% no-repeat;
@@ -362,27 +365,66 @@
         cursor: pointer;
     }
 
-    .ad {
+    .sleeve-options {
         margin-top: 7px;
         min-height: 0;
-        flex: 1;
-        background: var(--field);
+        flex: 1 1 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        align-content: start;
+        gap: 7px;
+        padding: 10px;
+    }
+
+    .sleeve-option {
+        min-width: 0;
+        min-height: 38px;
+        padding: 6px 9px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 40px;
+        gap: 8px;
+        border: 1px solid rgba(164, 23, 92, .65);
+        background: #090918;
+        color: var(--text);
         font-family: Roboto, sans-serif;
-        font-size: 30px;
-        line-height: 1.25;
+        font-size: 13px;
+        font-weight: 500;
+        text-align: left;
         text-transform: uppercase;
+        cursor: pointer;
+    }
+
+    .sleeve-option::before {
+        content: "";
+        width: 16px;
+        height: 16px;
+        flex: 0 0 16px;
+        border: 1px solid transparent;
+        border-radius: 50%;
+        background:
+            linear-gradient(135deg, var(--swatch-color) 0 50%, var(--inner-swatch-color) 50% 100%) padding-box,
+            linear-gradient(135deg, var(--swatch-color) 0 50%, var(--inner-swatch-color) 50% 100%) border-box;
+    }
+
+    .sleeve-option:hover,
+    .sleeve-option:focus-visible {
+        border-color: var(--accent);
+        outline: none;
+    }
+
+    .sleeve-option[aria-pressed="true"] {
+        border-color: var(--accent);
+        box-shadow: inset 0 0 0 1px var(--accent);
     }
 
     .controls input[type="search"],
     .controls .set-search,
     .controls .search-button,
     .controls .sleeve-select,
-    .controls .ad {
+    .controls .sleeve-options {
         background: transparent;
         border: 1px solid #a4175c;
     }
@@ -398,7 +440,7 @@
         color: #f5f5f5;
     }
 
-    .controls .ad {
+    .controls .sleeve-options {
         border: 1px solid;
         border-image: linear-gradient(to bottom, #a4175c, #6d0f3d) 1;
     }
@@ -434,6 +476,11 @@
             width: 100%;
             height: auto;
         }
+
+        .sleeve-options {
+            flex: 0 0 260px;
+            height: 260px;
+        }
     }
 
     @media (max-width: 430px) {
@@ -458,10 +505,6 @@
             font-size: 15px;
         }
 
-        .ad {
-            min-height: 260px;
-            font-size: 23px;
-        }
     }
 </style>
 </head>
@@ -505,7 +548,12 @@
                 <button id="search-button" class="search-button" type="button">Search</button>
             </div>
 
-            <select class="sleeve-select" id="sleeve-select" aria-label="Choose a sleeve brand and color">
+            <select class="sleeve-select" id="sleeve-select" aria-label="Choose a Dragon Shield collection">
+                <option value="matte" selected>Dragon Shield Matte</option>
+                <option value="dual">Dragon Shield Dual Matte</option>
+            </select>
+
+            <template id="sleeve-options-template">
                 <optgroup label="Dragon Shield Matte">
                     <option value="black" data-color="#0b0d0d">Black</option>
                     <option value="black-non-glare" data-color="#111313">Black (Non-Glare)</option>
@@ -561,17 +609,9 @@
                     <option value="crypt" data-color="#9c9c98">Crypt*</option>
                     <option value="clear" data-color="#f1f1ec">Clear</option>
                 </optgroup>
-                <optgroup label="Dragon Shield Dual Matte" id="dual-matte-options"></optgroup>
-            </select>
+            </template>
 
-            <div class="ad">
-                <div>
-                    SOME BULLSHIT HERE<br>
-                    WITH LINKS<br>
-                    TO BUY<br>
-                    THE SLEEVES
-                </div>
-            </div>
+            <div class="sleeve-options" id="sleeve-options" role="group" aria-label="Choose a sleeve color"></div>
         </div>
     </section>
 </main>
@@ -596,23 +636,73 @@
     const backSleeve = document.querySelector('.back-sleeve');
     const caption = document.getElementById('caption');
     const sleeveSelect = document.getElementById('sleeve-select');
-    const dualMatteOptions = document.getElementById('dual-matte-options');
+    const sleeveOptionsContainer = document.getElementById('sleeve-options');
+    const sleeveOptionsTemplate = document.getElementById('sleeve-options-template');
     const dualInnerColors = {
         'pomegranate-gold': '#b08a0a',
         'cobalt-silver': '#c0c7c6'
     };
 
-    document.querySelectorAll('optgroup[label="Dragon Shield Matte"] option').forEach(option => {
-        if (!option.textContent.includes('*')) return;
+    const allMatteOptions = Array.from(sleeveOptionsTemplate.content.querySelectorAll('optgroup[label="Dragon Shield Matte"] option'));
+    const matteOptions = allMatteOptions.filter(option => !option.textContent.includes('*'));
+    const dualOptions = allMatteOptions.filter(option => option.textContent.includes('*')).map(option => {
         const dualOption = option.cloneNode(true);
         dualOption.value = `dual-${option.value}`;
-        dualOption.selected = false;
         dualOption.removeAttribute('selected');
         dualOption.textContent = option.textContent.replace(/\*/g, '').trim();
         dualOption.dataset.innerColor = dualInnerColors[option.value] || '#0b0d0d';
-        dualMatteOptions.appendChild(dualOption);
-        option.remove();
+        return dualOption;
     });
+    const sleeveCollections = { matte: matteOptions, dual: dualOptions };
+    const rememberedSleeveValues = {
+        matte: allMatteOptions.find(option => option.hasAttribute('selected'))?.value || matteOptions[0]?.value,
+        dual: ''
+    };
+    let selectedSleeveOption;
+
+    function getSleeveLineColor(hexColor) {
+        const [red, green, blue] = hexColor.match(/[0-9a-f]{2}/gi).map(channel => parseInt(channel, 16) / 255);
+        const linearChannels = [red, green, blue].map(channel =>
+            channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
+        );
+        const luminance = 0.2126 * linearChannels[0] + 0.7152 * linearChannels[1] + 0.0722 * linearChannels[2];
+        return luminance >= 0.5 ? 'rgba(0, 0, 0, .05)' : 'rgba(255, 255, 255, .05)';
+    }
+
+    function applySleeveOption(option) {
+        selectedSleeveOption = option;
+        cardWrap.style.setProperty('--sleeve-color', option.dataset.color);
+        cardWrap.style.setProperty('--inner-color', option.dataset.innerColor || option.dataset.color);
+        backSleeve.style.setProperty('--sleeve-overlay', option.dataset.color);
+        backSleeve.style.setProperty('--sleeve-line-color', getSleeveLineColor(option.dataset.color));
+        caption.textContent = option.textContent;
+    }
+
+    function renderSleeveOptions() {
+        const options = sleeveCollections[sleeveSelect.value];
+        const selectedValue = rememberedSleeveValues[sleeveSelect.value];
+        const selectedOption = options.find(option => option.value === selectedValue) || options[0];
+        rememberedSleeveValues[sleeveSelect.value] = selectedOption.value;
+
+        sleeveOptionsContainer.replaceChildren(...options.map(option => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'sleeve-option';
+            button.textContent = option.textContent;
+            button.style.setProperty('--swatch-color', option.dataset.color);
+            button.style.setProperty('--inner-swatch-color', option.dataset.innerColor || option.dataset.color);
+            button.setAttribute('aria-pressed', String(option.value === selectedOption.value));
+            button.addEventListener('click', () => {
+                rememberedSleeveValues[sleeveSelect.value] = option.value;
+                sleeveOptionsContainer.querySelector('[aria-pressed="true"]')?.setAttribute('aria-pressed', 'false');
+                button.setAttribute('aria-pressed', 'true');
+                applySleeveOption(option);
+            });
+            return button;
+        }));
+
+        applySleeveOption(selectedOption);
+    }
 
     searchButton.addEventListener('click', searchForCard);
 
@@ -620,7 +710,7 @@
         cardImage.src = 'default_card.png';
         cardImage.alt = 'Default card';
         card.hidden = false;
-        caption.textContent = sleeveSelect.selectedOptions[0].textContent;
+        caption.textContent = selectedSleeveOption.textContent;
     });
 
     search.addEventListener('keydown', event => {
@@ -634,13 +724,7 @@
         setSearch.value = setSearch.value.replace(/[^a-z]/gi, '').slice(0, 3).toUpperCase();
     });
 
-    sleeveSelect.addEventListener('change', event => {
-        const option = event.target.selectedOptions[0];
-        cardWrap.style.setProperty('--sleeve-color', option.dataset.color);
-        cardWrap.style.setProperty('--inner-color', option.dataset.innerColor || option.dataset.color);
-        backSleeve.style.setProperty('--sleeve-overlay', option.dataset.color);
-        caption.textContent = option.textContent;
-    });
+    sleeveSelect.addEventListener('change', renderSleeveOptions);
 
     function searchForCard() {
         const cardName = search.value.trim();
@@ -649,7 +733,7 @@
     }
 
     async function loadCard(cardName, setCode = '') {
-        caption.textContent = sleeveSelect.selectedOptions[0].textContent;
+        caption.textContent = selectedSleeveOption.textContent;
         try {
             const setParameter = setCode ? `&set=${encodeURIComponent(setCode)}` : '';
             const response = await fetch(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}${setParameter}`);
@@ -660,13 +744,13 @@
             cardImage.alt = data.name;
             setSearch.value = data.set.toUpperCase();
             card.hidden = false;
-            caption.textContent = sleeveSelect.selectedOptions[0].textContent;
+            caption.textContent = selectedSleeveOption.textContent;
         } catch (error) {
-            caption.textContent = sleeveSelect.selectedOptions[0].textContent;
+            caption.textContent = selectedSleeveOption.textContent;
         }
     }
 
-    sleeveSelect.dispatchEvent(new Event('change'));
+    renderSleeveOptions();
 </script>
 </body>
 </html>
