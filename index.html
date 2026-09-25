@@ -35,9 +35,7 @@
         position: fixed;
         inset: -12px;
         z-index: 0;
-        background: var(--page-background-image, url("sleeveup_background.jpg")) center / cover no-repeat;
-        filter: blur(80px);
-        opacity: .15;
+        background: url("sleeveup_bg.png") center / cover no-repeat;
         transform: scale(1.15);
         pointer-events: none;
     }
@@ -64,7 +62,7 @@
         gap: 7px;
         font-family: Roboto, sans-serif;
         font-weight: 900;
-        font-size: 19px;
+        font-size: 23pt;
         letter-spacing: -1px;
     }
 
@@ -122,10 +120,6 @@
         border: 2px solid var(--inner-color, var(--sleeve-color, var(--accent)));
         border-radius: 2px;
         background-color: var(--inner-color, var(--sleeve-color, var(--accent)));
-        background-image:
-            repeating-linear-gradient(135deg, rgba(255,255,255,.13) 0 1px, transparent 1px 4px),
-            repeating-linear-gradient(45deg, rgba(0,0,0,.10) 0 1px, transparent 1px 5px);
-        background-size: 5px 5px, 7px 7px;
         box-shadow: 0 5px 18px rgba(0,0,0,.35);
     }
 
@@ -151,10 +145,6 @@
         inset: -2px;
         z-index: 1;
         background-color: var(--sleeve-color, var(--accent));
-        background-image:
-            repeating-linear-gradient(135deg, rgba(255,255,255,.08) 0 2px, transparent 2px 5px),
-            repeating-linear-gradient(45deg, rgba(0,0,0,.10) 0 1px, transparent 1px 5px);
-        background-size: 5px 5px, 7px 7px;
         clip-path: polygon(80% 0, 100% 0, 100% 100%, 20% 100%);
     }
 
@@ -495,10 +485,6 @@
             if (!data.image_uris?.normal) throw new Error('No card image available');
             cardImage.src = data.image_uris.normal;
             cardImage.alt = data.name;
-            document.body.style.setProperty(
-                '--page-background-image',
-                `url("${data.image_uris.art_crop || data.image_uris.normal}")`
-            );
             setSearch.value = data.set.toUpperCase();
             card.hidden = false;
             caption.textContent = `${sleeveSelect.selectedOptions[0].textContent} - ${data.name}`;
@@ -509,8 +495,9 @@
 
     sleeveSelect.dispatchEvent(new Event('change'));
     search.value = 'Black Lotus';
-    loadCard('Black Lotus').then(() => setSearch.value = setSearch.value.toUpperCase());
+    loadCard('Black Lotus', 'lea').then(() => setSearch.value = setSearch.value.toUpperCase());
 </script>
 </body>
 </html>
+
 
