@@ -29,7 +29,7 @@
             radial-gradient(circle at 50% 58%, rgba(28, 36, 74, .28), transparent 48%),
             linear-gradient(135deg, #071329 0%, #080d1f 45%, #070b1b 100%);
         color: var(--text);
-        font-family: Arial, Helvetica, sans-serif;
+        font-family: Roboto, sans-serif;
     }
 
     body::before {
@@ -177,9 +177,10 @@
     }
 
     .caption {
-        margin-top: 9px;
+        width: 500px;
+        margin: 9px 0 0 25px;
         text-align: center;
-        font-family: Oswald, Impact, sans-serif;
+        font-family: Roboto, sans-serif;
         font-size: 18px;
         font-weight: 600;
         text-transform: uppercase;
@@ -188,6 +189,9 @@
 
     .controls {
         min-width: 0;
+        height: 690px;
+        display: flex;
+        flex-direction: column;
     }
 
     input[type="search"] {
@@ -198,7 +202,7 @@
         outline: none;
         background: var(--field);
         color: white;
-        font-family: Oswald, Impact, sans-serif;
+        font-family: Roboto, sans-serif;
         font-size: 17px;
         text-transform: uppercase;
     }
@@ -220,7 +224,7 @@
         gap: 7px;
         margin-bottom: 4px;
         color: var(--muted);
-        font-family: Oswald, Impact, sans-serif;
+        font-family: Roboto, sans-serif;
         font-size: 13px;
         line-height: 1;
         text-transform: uppercase;
@@ -234,7 +238,7 @@
         outline: none;
         background: var(--field);
         color: white;
-        font-family: Oswald, Impact, sans-serif;
+        font-family: Roboto, sans-serif;
         font-size: 17px;
         text-transform: uppercase;
     }
@@ -249,7 +253,7 @@
         border: 0;
         background: var(--accent);
         color: #111;
-        font-family: Oswald, Impact, sans-serif;
+        font-family: Roboto, sans-serif;
         font-size: 17px;
         font-weight: 600;
         text-transform: uppercase;
@@ -270,7 +274,7 @@
         outline: none;
         background: var(--field);
         color: white;
-        font-family: Oswald, Impact, sans-serif;
+        font-family: Roboto, sans-serif;
         font-size: 17px;
         text-transform: uppercase;
         cursor: pointer;
@@ -278,17 +282,36 @@
 
     .ad {
         margin-top: 7px;
-        min-height: 347px;
+        min-height: 0;
+        flex: 1;
         background: var(--field);
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
         padding: 40px;
-        font-family: Oswald, Impact, sans-serif;
+        font-family: Roboto, sans-serif;
         font-size: 30px;
         line-height: 1.25;
         text-transform: uppercase;
+    }
+
+    .controls input[type="search"],
+    .controls .set-search,
+    .controls .search-button,
+    .controls .sleeve-select,
+    .controls .ad {
+        background: transparent;
+        border: 1px solid #a4175c;
+    }
+
+    .controls .search-button {
+        color: var(--text);
+    }
+
+    .controls .ad {
+        border: 1px solid;
+        border-image: linear-gradient(to bottom, #a4175c, #6d0f3d) 1;
     }
 
     @media (max-width: 800px) {
@@ -316,6 +339,7 @@
 
         .controls {
             width: 100%;
+            height: auto;
         }
     }
 
@@ -336,6 +360,8 @@
         }
 
         .caption {
+            width: 300px;
+            margin: 9px auto 0;
             font-size: 15px;
         }
 
