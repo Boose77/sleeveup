@@ -50,6 +50,23 @@
         align-items: center;
     }
 
+    footer {
+        position: relative;
+        z-index: 1;
+        height: 42.5px;
+        border-top: 1px solid rgba(59, 59, 59, .4);
+        background: rgba(6, 8, 19, .9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: left;
+        color: var(--text);
+        font-family: Oswald, Impact, sans-serif;
+        font-size: 10px;
+        line-height: 1.1;
+        text-transform: uppercase;
+    }
+
     .header-inner {
         width: 810px;
         max-width: calc(100% - 48px);
@@ -411,6 +428,15 @@
         </div>
     </section>
 </main>
+
+<footer>
+    <div class="header-inner">
+        <div>
+            Made in VSCode by Boose and Zevgor<br>
+            Copyright © 2026
+        </div>
+    </div>
+</footer>
 
 <script>
     const search = document.getElementById('search');
