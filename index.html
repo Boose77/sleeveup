@@ -214,13 +214,13 @@
 
     .search-row {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 74px 96px;
+        grid-template-columns: 42px minmax(0, 1fr) 74px 96px;
         gap: 7px;
     }
 
     .search-labels {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 74px 96px;
+        grid-template-columns: 42px minmax(0, 1fr) 74px 96px;
         gap: 7px;
         margin-bottom: 4px;
         color: var(--muted);
@@ -262,6 +262,20 @@
 
     .search-button:hover {
         background: #ffe16a;
+    }
+
+    .clear-card {
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        border: 1px solid #a4175c;
+        background: transparent;
+        color: var(--text);
+        font-family: Roboto, sans-serif;
+        font-size: 32px;
+        font-weight: 400;
+        line-height: 1;
+        cursor: pointer;
     }
 
     .sleeve-select {
@@ -307,6 +321,13 @@
 
     .controls .search-button {
         color: var(--text);
+    }
+
+    .controls .sleeve-select,
+    .controls .sleeve-select option,
+    .controls .sleeve-select optgroup {
+        background: #090918;
+        color: #f5f5f5;
     }
 
     .controls .ad {
@@ -387,8 +408,8 @@
     <section class="workspace">
         <div class="card-column">
             <div class="card-wrap">
-                <div class="card" id="card" hidden>
-                    <img class="card-image" id="card-image" alt="">
+                <div class="card" id="card">
+                    <img class="card-image" id="card-image" src="default_card.png" alt="Default card">
                 </div>
             </div>
 
@@ -397,10 +418,12 @@
 
         <div class="controls">
             <div class="search-labels" aria-hidden="true">
+                <span></span>
                 <span>Card Name</span>
                 <span>Set</span>
             </div>
             <div class="search-row">
+                <button id="clear-card" class="clear-card" type="button" aria-label="Clear loaded card">X</button>
                 <input id="search" type="search" placeholder="Search for new card..." autocomplete="off">
                 <input id="set-search" class="set-search" type="text" placeholder="SET" maxlength="3" pattern="[A-Za-z]{3}" aria-label="Three-letter card set code" autocomplete="off">
                 <button id="search-button" class="search-button" type="button">Search</button>
@@ -418,7 +441,7 @@
                     <option value="valor" data-color="#fff4c9">Valor*</option>
                     <option value="ivory" data-color="#fff4cf">Ivory</option>
                     <option value="lightning" data-color="#fff200">Lightning*</option>
-                    <option value="yellow" data-color="#ffd72b" selected>Yellow</option>
+                    <option value="yellow" data-color="#ffd72b">Yellow</option>
                     <option value="amber" data-color="#ffb12b">Amber</option>
                     <option value="orange" data-color="#ff8f12">Orange</option>
                     <option value="ember" data-color="#f24b17">Ember*</option>
@@ -431,7 +454,7 @@
                     <option value="peach" data-color="#f58485">Peach*</option>
                     <option value="pink" data-color="#f4a4b8">Pink</option>
                     <option value="pink-diamond" data-color="#ef4b90">Pink Diamond</option>
-                    <option value="magenta" data-color="#bd0070">Magenta</option>
+                    <option value="magenta" data-color="#bd0070" selected>Magenta</option>
                     <option value="wraith" data-color="#9b3f86">Wraith*</option>
                     <option value="pomegranate-gold" data-color="#9c3a57">Pomegranate &amp; Gold*</option>
                     <option value="orchid" data-color="#d6c7e4">Orchid*</option>
@@ -490,6 +513,7 @@
     const search = document.getElementById('search');
     const setSearch = document.getElementById('set-search');
     const searchButton = document.getElementById('search-button');
+    const clearCardButton = document.getElementById('clear-card');
     const card = document.getElementById('card');
     const cardImage = document.getElementById('card-image');
     const cardWrap = document.querySelector('.card-wrap');
@@ -514,6 +538,13 @@
     });
 
     searchButton.addEventListener('click', searchForCard);
+
+    clearCardButton.addEventListener('click', () => {
+        cardImage.removeAttribute('src');
+        cardImage.alt = '';
+        card.hidden = true;
+        caption.textContent = sleeveSelect.selectedOptions[0].textContent;
+    });
 
     search.addEventListener('keydown', event => {
         if (event.key === 'Enter') {
@@ -558,8 +589,6 @@
     }
 
     sleeveSelect.dispatchEvent(new Event('change'));
-    search.value = 'Black Lotus';
-    loadCard('Black Lotus', 'lea').then(() => setSearch.value = setSearch.value.toUpperCase());
 </script>
 </body>
 </html>
