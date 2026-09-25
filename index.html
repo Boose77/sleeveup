@@ -572,9 +572,9 @@
     searchButton.addEventListener('click', searchForCard);
 
     clearCardButton.addEventListener('click', () => {
-        cardImage.removeAttribute('src');
-        cardImage.alt = '';
-        card.hidden = true;
+        cardImage.src = 'default_card.png';
+        cardImage.alt = 'Default card';
+        card.hidden = false;
         caption.textContent = sleeveSelect.selectedOptions[0].textContent;
     });
 
