@@ -183,8 +183,34 @@
         position: relative;
     }
 
+    .back-sleeve {
+        position: absolute;
+        top: 45px;
+        left: 525px;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .back-sleeve img {
+        display: block;
+        position: relative;
+        z-index: 0;
+    }
+
+    .back-sleeve::after {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        inset: 0;
+        background: var(--sleeve-overlay, #ffd72b);
+        opacity: 1;
+        -webkit-mask: url("back_sleeve.png") center / 100% 100% no-repeat;
+        mask: url("back_sleeve.png") center / 100% 100% no-repeat;
+    }
+
     .card-wrap {
         position: relative;
+        z-index: 1;
         width: 500px;
         aspect-ratio: 500 / 690;
         max-width: 100%;
@@ -193,7 +219,7 @@
         border: 2px solid var(--inner-color, var(--sleeve-color, var(--accent)));
         border-radius: 2px;
         background-color: var(--inner-color, var(--sleeve-color, var(--accent)));
-        box-shadow: 10px 0 20px 20px rgba(0, 0, 0, .35);
+        box-shadow: 5px 0 10px 10px rgba(0, 0, 0, .35);
     }
 
     .card {
@@ -396,6 +422,10 @@
             margin: 0 auto;
         }
 
+        .back-sleeve {
+            display: none;
+        }
+
         .card {
             width: 100%;
         }
@@ -454,6 +484,9 @@
                 <div class="card" id="card">
                     <img class="card-image" id="card-image" src="default_card.png" alt="Default card">
                 </div>
+            </div>
+            <div class="back-sleeve">
+                <img src="back_sleeve.png" alt="">
             </div>
 
             <div class="caption" id="caption">Yellow</div>
@@ -560,6 +593,7 @@
     const card = document.getElementById('card');
     const cardImage = document.getElementById('card-image');
     const cardWrap = document.querySelector('.card-wrap');
+    const backSleeve = document.querySelector('.back-sleeve');
     const caption = document.getElementById('caption');
     const sleeveSelect = document.getElementById('sleeve-select');
     const dualMatteOptions = document.getElementById('dual-matte-options');
@@ -604,6 +638,7 @@
         const option = event.target.selectedOptions[0];
         cardWrap.style.setProperty('--sleeve-color', option.dataset.color);
         cardWrap.style.setProperty('--inner-color', option.dataset.innerColor || option.dataset.color);
+        backSleeve.style.setProperty('--sleeve-overlay', option.dataset.color);
         caption.textContent = option.textContent;
     });
 
